@@ -1,22 +1,49 @@
 package uniq
 
-type Interface interface {
+type Keyer interface {
 	Key() int
 }
 
-func Uniq(items []Interface) []Interface {
+type Interface interface {
+	Len() int
+	Get(i int) Keyer
+	Set(i int, item Keyer)
+	Slice(left, right int) Interface
+	New(size int) Interface
+}
 
-	set := make(map[int]Interface)
-	for _, c := range items {
-		set[c.Key()] = c
+// func Uniq(items Interface) []Interface {
+
+// 	set := make(map[int]Interface)
+// 	for _, c := range items {
+// 		set[c.Key()] = c
+// 	}
+
+// 	results := make([]Interface, len(set))
+// 	i := 0
+// 	for _, value := range set {
+// 		results[i] = value
+// 		i++
+// 	}
+
+// 	return results
+// }
+
+func Uniq(items Interface) Interface {
+	set := make(map[int]Keyer)
+	var item Keyer
+	for i := 0; i < items.Len(); i++ {
+		item = items.Get(i)
+		set[item.Key()] = item
 	}
 
-	results := make([]Interface, len(set))
+	uniqs := items.New(len(set))
+
 	i := 0
 	for _, value := range set {
-		results[i] = value
+		uniqs.Set(i, value)
 		i++
 	}
 
-	return results
+	return uniqs
 }
